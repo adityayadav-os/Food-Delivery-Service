@@ -2,6 +2,7 @@ package com.fooddelivery.restaurant_service.service;
 
 import com.fooddelivery.restaurant_service.entity.MenuItem;
 import com.fooddelivery.restaurant_service.entity.Restaurant;
+import com.fooddelivery.restaurant_service.exception.ResourceNotFoundException;
 import com.fooddelivery.restaurant_service.repository.MenuItemRepository;
 import com.fooddelivery.restaurant_service.repository.RestaurantRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     @Override
     public Restaurant getRestaurantById(Long id) {
         return restaurantRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Restaurant not found with ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found with ID: " + id));
     }
 
     @Override
@@ -57,7 +58,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     @Override
     public MenuItem updateMenuItem(Long itemId, MenuItem itemDetails) {
         MenuItem menuItem = menuItemRepository.findById(itemId)
-                .orElseThrow(() -> new RuntimeException("Menu Item not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Menu Item not found"));
         menuItem.setName(itemDetails.getName());
         menuItem.setDescription(itemDetails.getDescription());
         menuItem.setPrice(itemDetails.getPrice());
@@ -69,7 +70,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     @Override
     public void deleteMenuItem(Long itemId) {
         MenuItem menuItem = menuItemRepository.findById(itemId)
-                .orElseThrow(() -> new RuntimeException("Menu Item not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Menu Item not found"));
         menuItemRepository.delete(menuItem);
     }
 
