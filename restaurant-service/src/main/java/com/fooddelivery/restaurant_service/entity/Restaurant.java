@@ -10,7 +10,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "restaurants")
+@Table(name = "restaurants", indexes = {
+    @Index(name = "idx_restaurant_name", columnList = "name"),
+    @Index(name = "idx_restaurant_location", columnList = "location")
+})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -31,7 +34,15 @@ public class Restaurant {
 
     private String contactNumber;
 
-    private boolean isActive = true;
+    private Boolean isActive = true;
+
+    private Boolean isApproved = false;
+
+    @Column(length = 1000)
+    private String imageUrl;
+
+    private String subscriptionType; // MONTHLY, YEARLY, FULL_PAYMENT
+    private Double subscriptionFee;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/restaurants")
 @RequiredArgsConstructor
@@ -19,6 +20,29 @@ public class RestaurantController {
     @GetMapping
     public ResponseEntity<List<Restaurant>> getAllActiveRestaurants() {
         return ResponseEntity.ok(restaurantService.getAllActiveRestaurants());
+    }
+
+    @GetMapping("/pending")
+    public ResponseEntity<List<Restaurant>> getPendingRestaurants() {
+        return ResponseEntity.ok(restaurantService.getPendingRestaurants());
+    }
+
+    @PutMapping("/{id}/approve")
+    public ResponseEntity<Restaurant> approveRestaurant(
+            @PathVariable Long id,
+            @RequestParam(required = false, defaultValue = "MONTHLY") String subscriptionType,
+            @RequestParam(required = false, defaultValue = "0.0") Double subscriptionFee) {
+        return ResponseEntity.ok(restaurantService.approveRestaurant(id, subscriptionType, subscriptionFee));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Restaurant>> searchRestaurants(@RequestParam String q) {
+        return ResponseEntity.ok(restaurantService.searchRestaurants(q));
+    }
+
+    @GetMapping("/search/universal")
+    public ResponseEntity<com.fooddelivery.restaurant_service.dto.SearchResultDTO> universalSearch(@RequestParam String q) {
+        return ResponseEntity.ok(restaurantService.universalSearch(q));
     }
 
     @GetMapping("/{id}")
@@ -37,8 +61,10 @@ public class RestaurantController {
         return new ResponseEntity<>(restaurantService.createRestaurant(restaurant), HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Restaurant> updateRestaurant(@PathVariable Long id, @RequestBody Restaurant restaurant) {
-        return ResponseEntity.ok(restaurantService.updateRestaurant(id, restaurant));
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteRestaurant(@PathVariable Long id) {
+        restaurantService.deleteRestaurant(id);
+        return ResponseEntity.ok().build();
     }
 }
+

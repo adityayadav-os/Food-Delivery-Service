@@ -1,6 +1,58 @@
+# Compiled class file
+*.class
 
-# Ignore local properties
-**/application.properties
+# Log file
+*.log
 
-# Ignore local properties
+# Package Files #
+*.jar
+*.war
+
+# Maven / Gradle
+target/
+build/
+.gradle/
+
+# IDE Files
+.idea/
+*.iml
+# Compiled class file
+*.class
+
+# Temporary Test Files
+Test.java
+HashGen.java
+
+# Log file
+*.log
+
+# Package Files #
+*.jar
+*.war
+
+# Maven / Gradle
+target/
+build/
+.gradle/
+
+# IDE Files
+.idea/
+*.iml
+.vscode/
+
+# Ignore local properties files but allow prod
 **/application.properties
+**/.env
+
+# Secrets and environments
+.env
+.env.*
+
+# Node / React
+node_modules/
+dist/
+npm-debug.log*
+
+# OS generated files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Service Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF5A5F;
+            --primary-hover: #ff757a;
+            --secondary: #00A699;
+            --bg-color: #f7f9fc;
+            --surface: #ffffff;
+            --text-main: #222222;
+            --text-light: #767676;
+            --border-color: #e4e4e4;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+            --radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .header-title {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .header-title h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .header-title p {
+            color: var(--text-light);
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .card h2 {
+            margin-bottom: 1.5rem;
+            font-size: 1.25rem;
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 0.5rem;
+            color: var(--secondary);
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 90, 95, 0.1);
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+        }
+
+        .btn-secondary:hover {
+            background-color: #008f83;
+        }
+
+        /* Order Items UI */
+        .items-container {
+            background: var(--bg-color);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .item-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .item-row input {
+            padding: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .add-item-btn {
+            background: none;
+            color: var(--secondary);
+            border: 1px dashed var(--secondary);
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .add-item-btn:hover {
+            background: rgba(0, 166, 153, 0.1);
+        }
+
+        /* Result Box */
+        .result-box {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #282c34;
+            color: #61dafb;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            display: none;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: #ffe3e3;
+            color: #d63333;
+        }
+        .status-PENDING { background: #fff3cd; color: #856404; }
+        .status-ACCEPTED { background: #d4edda; color: #155724; }
+        .status-PREPARING { background: #cce5ff; color: #004085; }
+        .status-DELIVERED { background: #e2e3e5; color: #383d41; }
+        
+        /* Loader */
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            display: none;
+            vertical-align: middle;
+            margin-left: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-title">
+        <h1>Order Service Portal</h1>
+        <p>Dynamic dashboard to test Order creation and updates.</p>
+    </div>
+
+    <!-- Create Order Card -->
+    <div class="card">
+        <h2>🛍️ Create New Order</h2>
+        <form id="createOrderForm">
+            <div class="form-group">
+                <label for="userId">User ID</label>
+                <input type="number" id="userId" value="1" required>
+            </div>
+            <div class="form-group">
+                <label for="restaurantId">Restaurant ID</label>
+                <input type="number" id="restaurantId" value="101" required>
+            </div>
+            
+            <label style="font-size: 0.9rem; font-weight: 500; margin-bottom:0.5rem; display:block;">Order Items</label>
+            <div class="items-container" id="itemsList">
+                <div class="item-row">
+                    <input type="number" placeholder="Product ID" class="i-pid" value="201" required>
+                    <input type="number" placeholder="Qty" class="i-qty" value="2" required min="1">
+                    <input type="number" placeholder="Price" class="i-price" value="150" required min="1">
+                </div>
+            </div>
+            <button type="button" class="add-item-btn" onclick="addItemRow()">+ Add Another Item</button>
+
+            <button type="submit" style="margin-top: 1rem;">
+                Place Order <span class="loader" id="createLoader"></span>
+            </button>
+        </form>
+        <div id="createResult" class="result-box"></div>
+    </div>
+
+    <!-- Manage Order Card -->
+    <div>
+        <div class="card" style="margin-bottom: 2rem;">
+            <h2>🔍 Check Order Status</h2>
+            <form id="getOrderForm">
+                <div class="form-group">
+                    <label for="searchOrderId">Order ID</label>
+                    <input type="number" id="searchOrderId" placeholder="e.g. 1" required>
+                </div>
+                <button type="submit" class="btn-secondary">
+                    Fetch Order <span class="loader" id="getLoader"></span>
+                </button>
+            </form>
+            <div id="getResult" class="result-box"></div>
+        </div>
+
+        <div class="card">
+            <h2>🔄 Update Status</h2>
+            <form id="updateStatusForm">
+                <div class="form-group">
+                    <label for="updateOrderId">Order ID</label>
+                    <input type="number" id="updateOrderId" required>
+                </div>
+                <div class="form-group">
+                    <label for="newStatus">New Status</label>
+                    <select id="newStatus" required>
+                        <option value="ACCEPTED">ACCEPTED</option>
+                        <option value="PREPARING">PREPARING</option>
+                        <option value="DELIVERED">DELIVERED</option>
+                    </select>
+                </div>
+                <button type="submit" style="background-color: #f5a623;">
+                    Update Status <span class="loader" id="updateLoader"></span>
+                </button>
+            </form>
+            <div id="updateResult" class="result-box"></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const API_BASE = '/api/orders';
+
+    function showResult(elementId, data, isError = false) {
+        const el = document.getElementById(elementId);
+        el.style.display = 'block';
+        el.style.color = isError ? '#ff757a' : '#61dafb';
+        el.textContent = JSON.stringify(data, null, 2);
+    }
+
+    function toggleLoader(loaderId, show) {
+        document.getElementById(loaderId).style.display = show ? 'inline-block' : 'none';
+    }
+
+    function addItemRow() {
+        const list = document.getElementById('itemsList');
+        const row = document.createElement('div');
+        row.className = 'item-row';
+        row.innerHTML = `
+            <input type="number" placeholder="Product ID" class="i-pid" required>
+            <input type="number" placeholder="Qty" class="i-qty" required min="1">
+            <input type="number" placeholder="Price" class="i-price" required min="1">
+            <button type="button" style="width:auto; padding:0.5rem; background: #e4e4e4; color:#333;" onclick="this.parentElement.remove()">X</button>
+        `;
+        list.appendChild(row);
+    }
+
+    // Create Order
+    document.getElementById('createOrderForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        toggleLoader('createLoader', true);
+        
+        const items = [];
+        document.querySelectorAll('.item-row').forEach(row => {
+            items.push({
+                productId: parseInt(row.querySelector('.i-pid').value),
+                quantity: parseInt(row.querySelector('.i-qty').value),
+                price: parseFloat(row.querySelector('.i-price').value)
+            });
+        });
+
+        const payload = {
+            userId: parseInt(document.getElementById('userId').value),
+            restaurantId: parseInt(document.getElementById('restaurantId').value),
+            items: items
+        };
+
+        try {
+            const res = await fetch(`${API_BASE}/create`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            showResult('createResult', data, !res.ok);
+            if(res.ok) {
+                // Pre-fill IDs for other forms
+                document.getElementById('searchOrderId').value = data.id;
+                document.getElementById('updateOrderId').value = data.id;
+            }
+        } catch (error) {
+            showResult('createResult', { error: error.message }, true);
+        } finally {
+            toggleLoader('createLoader', false);
+        }
+    });
+
+    // Get Order
+    document.getElementById('getOrderForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        toggleLoader('getLoader', true);
+        const id = document.getElementById('searchOrderId').value;
+        try {
+            const res = await fetch(`${API_BASE}/${id}`);
+            const data = await res.json();
+            showResult('getResult', data, !res.ok);
+        } catch (error) {
+            showResult('getResult', { error: error.message }, true);
+        } finally {
+            toggleLoader('getLoader', false);
+        }
+    });
+
+    // Update Status
+    document.getElementById('updateStatusForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        toggleLoader('updateLoader', true);
+        const id = document.getElementById('updateOrderId').value;
+        const status = document.getElementById('newStatus').value;
+        try {
+            const res = await fetch(`${API_BASE}/${id}/status?status=${status}`, {
+                method: 'PUT'
+            });
+            const data = await res.json();
+            showResult('updateResult', data, !res.ok);
+        } catch (error) {
+            showResult('updateResult', { error: error.message }, true);
+        } finally {
+            toggleLoader('updateLoader', false);
+        }
+    });
+</script>
+</body>
+</html>

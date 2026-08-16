@@ -40,6 +40,10 @@ public class UserServiceImpl implements UserService {
             throw new com.fooddelivery.user_service.exception.UserAlreadyExistsException("Error: Phone Number is already taken!");
         }
 
+        if (request.getRole() == com.fooddelivery.user_service.entity.RoleName.ROLE_ADMIN) {
+            throw new IllegalArgumentException("Error: Cannot register as Super Admin directly!");
+        }
+
         User user = new User();
         user.setName(request.getName());
         user.setEmail(request.getEmail());
@@ -48,9 +52,10 @@ public class UserServiceImpl implements UserService {
         user.setAddress(request.getAddress());
         user.setRole(request.getRole());
 
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
-        return new AuthResponse("Dummy-JWT-Token-For-Now", "User registered successfully");
+        // 4. Return success response (in real app, generate JWT token)
+        return new AuthResponse("Dummy-JWT-Token-For-Now", "User registered successfully", savedUser);
     }
 
     @Override
@@ -63,7 +68,8 @@ public class UserServiceImpl implements UserService {
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-                return new AuthResponse("Dummy-JWT-Token-For-Now", "Login successful");
+                // 3. Return token
+                return new AuthResponse("Dummy-JWT-Token-For-Now", "Login successful", user);
             } else {
                 throw new com.fooddelivery.user_service.exception.InvalidCredentialsException("Invalid Password");
             }

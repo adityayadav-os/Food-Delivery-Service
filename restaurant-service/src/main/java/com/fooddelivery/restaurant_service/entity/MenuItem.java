@@ -11,7 +11,9 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "menu_items")
+@Table(name = "menu_items", indexes = {
+    @Index(name = "idx_menuitem_name", columnList = "name")
+})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,7 +25,8 @@ public class MenuItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", nullable = false)
-    @JsonIgnore
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+
     private Restaurant restaurant;
 
     @Column(nullable = false)
@@ -34,9 +37,13 @@ public class MenuItem {
     @Column(nullable = false)
     private Double price;
 
-    private boolean isAvailable = true;
+    private Boolean isAvailable = true;
 
     private String category; // e.g., Starter, Main Course, Dessert, Beverages
+
+    private String type; // e.g., Veg, Non-Veg
+    
+    private String image; // Image URL
 
     @CreationTimestamp
     private LocalDateTime createdAt;
