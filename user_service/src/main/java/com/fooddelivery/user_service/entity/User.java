@@ -20,10 +20,10 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String phoneNumber;
 
-    @Column(nullable = false)
+    @Column
     private String password;
 
     private String address;

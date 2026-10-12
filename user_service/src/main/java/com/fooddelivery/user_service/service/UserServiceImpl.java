@@ -67,7 +67,7 @@ public class UserServiceImpl implements UserService {
 
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            if (user.getPassword() != null && passwordEncoder.matches(request.getPassword(), user.getPassword())) {
                 // 3. Return token
                 return new AuthResponse("Dummy-JWT-Token-For-Now", "Login successful", user);
             } else {

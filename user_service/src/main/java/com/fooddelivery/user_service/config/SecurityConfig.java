@@ -17,6 +17,12 @@ import java.util.Arrays;
 @Configuration
 public class SecurityConfig {
 
+    private final com.fooddelivery.user_service.security.oauth2.OAuth2AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler;
+
+    public SecurityConfig(com.fooddelivery.user_service.security.oauth2.OAuth2AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler) {
+        this.oauth2AuthenticationSuccessHandler = oauth2AuthenticationSuccessHandler;
+    }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -27,8 +33,15 @@ public class SecurityConfig {
         http.cors(Customizer.withDefaults())
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/index.html", "/", "/css/**", "/js/**").permitAll()
+                .requestMatchers("/api/auth/**", "/oauth2/**", "/login/oauth2/**", "/index.html", "/", "/css/**", "/js/**").permitAll()
                 .anyRequest().authenticated()
+            )
+            .oauth2Login(oauth2 -> oauth2
+                .successHandler(oauth2AuthenticationSuccessHandler)
+                .failureHandler((request, response, exception) -> {
+                    System.err.println("OAuth2 Login Failed: " + exception.getMessage());
+                    response.sendRedirect("http://localhost:5173/login?error=" + java.net.URLEncoder.encode(exception.getMessage(), java.nio.charset.StandardCharsets.UTF_8));
+                })
             );
         return http.build();
     }
